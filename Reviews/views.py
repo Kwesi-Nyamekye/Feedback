@@ -18,23 +18,6 @@ class ReviewView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-    
-
-    def get(self, request):
-        form = ReviewForm() 
-
-        return render(request, "reviews/review.html", {
-           "form": form })
-    
-    def post(self, request):
-        form = ReviewForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect("/thank-you")
-        
-        return render(request, "reviews/review.html", {
-        "form": form })
 
 class ThankYouView(TemplateView):
     template_name = "reviews/thank_you.html"
@@ -48,3 +31,12 @@ class ReviewListView(ListView):
 class SingleReviewView(DetailView):
     template_name = "reviews/single_review.html"
     model = Review 
+
+class AddFavoriteView(View):
+    def post(self, requests):
+        review_id = requests.POST["review_id"]
+        favorite_review = Review.objects.get(pk=review_id)
+        requests.session["favorite_review"] = favorite_review
+        return HttpResponseRedirect("/reviews/" + review_id)
+
+        
